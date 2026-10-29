@@ -1,15 +1,17 @@
 # GitHub и Web
 
-Репозиторий: [PilotOfAsuka/wolf-moon-remastered](https://github.com/PilotOfAsuka/wolf-moon-remastered).
+[Репозиторий](https://github.com/PilotOfAsuka/wolf-moon-remastered) · [Играть в браузере](https://pilotofasuka.github.io/wolf-moon-remastered/)
 
-Адрес игры после первой успешной публикации: [Играть в браузере](https://pilotofasuka.github.io/wolf-moon-remastered/). Ссылка размещена в начале README. Игра распространяется только как Web; установка не нужна.
+- **godot** — основная ветка с исходным Godot-проектом.
+- **web-build** — готовый экспорт: index.html, JavaScript, WebAssembly и пакет игры в корне ветки.
+- GitHub Pages: **Deploy from a branch → web-build → / (root)**. Pages обновляется после отправки новой Web-сборки в эту ветку.
 
-Пользователь разрешил открыть репозиторий и публиковать готовую игру, отменив прежнее ограничение ТЗ. Сам JAR, декомпиляция, research, локальные сборки и кэши исключены из Git. Репозиторий открыт после подтверждения GitHub Mobile. В Pages выбран источник GitHub Actions; первая публикация готовится.
+JAR, декомпиляция, research и кэши не публикуются. Godot 4.7.2 экспортирует игру в single-thread WebGL 2, поэтому специальные COOP/COEP headers не нужны. Сохранения хранятся в браузере для адреса сайта.
 
-`Publish Web to GitHub Pages` собирает и публикует игру при push в main или ручном запуске. В Settings → Pages источником должна быть выбрана GitHub Actions. Workflow получает официальный Godot 4.7.2 и Web-шаблон, импортирует проект, экспортирует Web и разворачивает Pages. Артефакт сборки используется автоматически для публикации.
+## Для разработчиков
 
-`Build Godot Web` проверяет сборку pull request и доступен для ручной проверки. Отдельная публикация установочных сборок не предусмотрена.
+1. Открыть game/project.godot в Godot 4.7.2 и выполнить экспорт Web.
+2. Готовые файлы из build/web перенести в рабочую копию ветки web-build. Локальная рабочая копия сборки — build/web-build; исходная ветка godot остаётся отдельной.
+3. Отправить коммит web-build. Игроки открывают ссылку Pages; установка и инструменты разработки им не нужны.
 
-Web использует один поток и WebGL 2, поэтому специальные COOP/COEP headers не нужны. Сохранения находятся в IndexedDB текущего origin.
-
-Для разработчиков: локальный экспорт `Godot --headless --path game --export-release Web`, затем `python3 -m http.server 8765 --directory build/web`. Для запуска готовой игры эти инструменты не нужны.
+Workflow Build Godot Web оставлен для необязательной ручной проверки. Первая попытка автоматической сборки не стартовала: GitHub сообщил, что Actions аккаунта заблокирован из-за billing issue. Публикация переведена на готовую ветку по предложению пользователя; её фактический результат нужно подтвердить на сайте Pages.
