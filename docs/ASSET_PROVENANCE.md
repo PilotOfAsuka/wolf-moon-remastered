@@ -13,3 +13,7 @@ MIDI cf..cj преобразованы `tools/RenderMidi.java` через шта
 `game/assets/fonts` — локально растеризованные Arial glyphs для MIDP bridge. Font API в Java ME зависел от телефона; эти метрики ещё не сопоставлены с конкретным OEM-устройством.
 
 CFR 0.152: [официальный источник](https://www.benf.org/other/cfr/). Godot: [официальная страница 4.7.2](https://godotengine.org/download/archive/4.7.2-stable/). Ранний Scale2x shader остаётся как необязательный технический fallback, [описание алгоритма](https://www.scale2x.it/algorithm). Финальное широкоформатное представление использует повтор исходного display list, а не Scale2x или 3D.
+
+## UI-навигация
+
+`game/assets/ui/*.svg` — собственные простые векторные стрелки и значок действия. Используются вместо символов системного шрифта, отсутствовавших в Web. На игровой мир и оригинальные bitmap-ресурсы не влияют.

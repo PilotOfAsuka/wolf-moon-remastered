@@ -10,7 +10,7 @@ func capture(name: String) -> void:
 	assert(image.save_png(ProjectSettings.globalize_path("res://../build/"+name+".png"))==OK)
 
 func run() -> void:
-	root.size=Vector2i(1152,900)
+	root.size=Vector2i(1440,810)
 	main=load("res://main.tscn").instantiate()
 	root.add_child(main)
 	if main.remastered:main.toggle_mode()
@@ -32,12 +32,10 @@ func run() -> void:
 	main.toggle_mode()
 	var state: Dictionary=main.presentation.collect()
 	print("DISPLAY LIST ",state.get("render_commands",[]).size()," commands")
-	for cmd: Dictionary in state.get("render_commands",[]):
-		if cmd.kind=="image":print("RAW IMAGE ",cmd.image.get_size()," rect ",cmd.rect," clip ",cmd.clip)
 	main.modern_world.synchronize(state,1.0)
 	main.modern_ui.update_state(state)
 	await create_timer(0.5).timeout
-	await capture("remastered")
+	await capture("wide_classic")
 	var frozen: Dictionary=main.game.diagnostic_state()
 	main.toggle_mode()
 	await create_timer(0.5).timeout

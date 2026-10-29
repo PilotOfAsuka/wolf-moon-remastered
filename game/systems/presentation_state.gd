@@ -22,9 +22,12 @@ func paragraphs(container: WMObject,cl: String) -> String:
 	return "\n\n".join(parts)
 
 func collect() -> Dictionary:
-	var state: Dictionary={"screen":"","world_ready":false,"menu":[],"dialogue":"","story_sprite":-1,"inventory":[],"creatures":[],"objects":[],"items":[],"inside":false}
+	var state: Dictionary={"screen":"","world_ready":false,"menu":[],"dialogue":"","story_sprite":-1,"inventory":[],"creatures":[],"objects":[],"items":[],"inside":false,"softkeys":[]}
 	var screen: Variant=vm.get_static("m","a","Lp;")
-	if screen!=null: state.screen=screen.type
+	if screen!=null:
+		state.screen=screen.type
+		var softkeys: Variant=vm.get_field(screen,"p","a","[Ljava/lang/String;")
+		if softkeys!=null:state.softkeys=softkeys.data.duplicate()
 	if screen!=null and screen.type=="j":
 		state.menu_id=vm.get_field(screen,"j","j","I")
 		state.title=vm.get_field(screen,"j","a","Ljava/lang/String;")

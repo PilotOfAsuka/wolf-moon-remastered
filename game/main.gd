@@ -50,6 +50,7 @@ func configure_web_scale() -> void:
 func button(parent: Node,text: String,action: Callable) -> Button:
 	var b: Button = Button.new()
 	b.text = text
+	WolfDirectionIcons.apply(b)
 	b.custom_minimum_size = Vector2(72,44)
 	b.focus_mode = Control.FOCUS_NONE
 	b.pressed.connect(action)
