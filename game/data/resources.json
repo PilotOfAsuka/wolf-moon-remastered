@@ -1,0 +1,774 @@
+[
+  {
+    "id": 0,
+    "offset": 0,
+    "file": "l",
+    "size": 69485,
+    "format": "six language slots (duplicates), modified UTF-8",
+    "languages": [
+      "English",
+      "Русский",
+      "English",
+      "Русский",
+      "English",
+      "Русский"
+    ],
+    "language_offsets": [
+      [
+        "English",
+        0
+      ],
+      [
+        "Русский",
+        10331
+      ],
+      [
+        "English",
+        0
+      ],
+      [
+        "Русский",
+        10331
+      ],
+      [
+        "English",
+        0
+      ],
+      [
+        "Русский",
+        10331
+      ]
+    ],
+    "actual_size": 30158
+  },
+  {
+    "id": 1,
+    "offset": 0,
+    "file": "r",
+    "size": 36,
+    "format": "sprite frame metadata",
+    "sheet": "aa.png",
+    "frames": [
+      0,
+      2
+    ]
+  },
+  {
+    "id": 2,
+    "offset": 36,
+    "file": "r",
+    "size": 36,
+    "format": "sprite frame metadata",
+    "sheet": "ab.png",
+    "frames": [
+      2,
+      4
+    ]
+  },
+  {
+    "id": 3,
+    "offset": 72,
+    "file": "r",
+    "size": 240,
+    "format": "sprite frame metadata",
+    "sheet": "ac.png",
+    "frames": [
+      4,
+      23
+    ]
+  },
+  {
+    "id": 4,
+    "offset": 312,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "ad.png",
+    "frames": [
+      23,
+      24
+    ]
+  },
+  {
+    "id": 5,
+    "offset": 336,
+    "file": "r",
+    "size": 36,
+    "format": "sprite frame metadata",
+    "sheet": "ae.png",
+    "frames": [
+      24,
+      26
+    ]
+  },
+  {
+    "id": 6,
+    "offset": 372,
+    "file": "r",
+    "size": 144,
+    "format": "sprite frame metadata",
+    "sheet": "af.png",
+    "frames": [
+      26,
+      37
+    ]
+  },
+  {
+    "id": 7,
+    "offset": 516,
+    "file": "r",
+    "size": 624,
+    "format": "sprite frame metadata",
+    "sheet": "ag.png",
+    "frames": [
+      37,
+      88
+    ]
+  },
+  {
+    "id": 8,
+    "offset": 1140,
+    "file": "r",
+    "size": 216,
+    "format": "sprite frame metadata",
+    "sheet": "ah.png",
+    "frames": [
+      88,
+      105
+    ]
+  },
+  {
+    "id": 9,
+    "offset": 1356,
+    "file": "r",
+    "size": 516,
+    "format": "sprite frame metadata",
+    "sheet": "ai.png",
+    "frames": [
+      105,
+      147
+    ]
+  },
+  {
+    "id": 10,
+    "offset": 1872,
+    "file": "r",
+    "size": 192,
+    "format": "sprite frame metadata",
+    "sheet": "aj.png",
+    "frames": [
+      147,
+      162
+    ]
+  },
+  {
+    "id": 11,
+    "offset": 2064,
+    "file": "r",
+    "size": 192,
+    "format": "sprite frame metadata",
+    "sheet": "ak.png",
+    "frames": [
+      162,
+      177
+    ]
+  },
+  {
+    "id": 12,
+    "offset": 2256,
+    "file": "r",
+    "size": 192,
+    "format": "sprite frame metadata",
+    "sheet": "al.png",
+    "frames": [
+      177,
+      192
+    ]
+  },
+  {
+    "id": 13,
+    "offset": 2448,
+    "file": "r",
+    "size": 192,
+    "format": "sprite frame metadata",
+    "sheet": "am.png",
+    "frames": [
+      192,
+      207
+    ]
+  },
+  {
+    "id": 14,
+    "offset": 2640,
+    "file": "r",
+    "size": 192,
+    "format": "sprite frame metadata",
+    "sheet": "an.png",
+    "frames": [
+      207,
+      222
+    ]
+  },
+  {
+    "id": 15,
+    "offset": 2832,
+    "file": "r",
+    "size": 168,
+    "format": "sprite frame metadata",
+    "sheet": "ao.png",
+    "frames": [
+      222,
+      235
+    ]
+  },
+  {
+    "id": 16,
+    "offset": 3000,
+    "file": "r",
+    "size": 336,
+    "format": "sprite frame metadata",
+    "sheet": "ap.png",
+    "frames": [
+      235,
+      262
+    ]
+  },
+  {
+    "id": 17,
+    "offset": 3336,
+    "file": "r",
+    "size": 60,
+    "format": "sprite frame metadata",
+    "sheet": "aq.png",
+    "frames": [
+      262,
+      266
+    ]
+  },
+  {
+    "id": 18,
+    "offset": 3396,
+    "file": "r",
+    "size": 48,
+    "format": "sprite frame metadata",
+    "sheet": "ar.png",
+    "frames": [
+      266,
+      269
+    ]
+  },
+  {
+    "id": 19,
+    "offset": 3444,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "as.png",
+    "frames": [
+      269,
+      270
+    ]
+  },
+  {
+    "id": 20,
+    "offset": 3468,
+    "file": "r",
+    "size": 84,
+    "format": "sprite frame metadata",
+    "sheet": "at.png",
+    "frames": [
+      270,
+      276
+    ]
+  },
+  {
+    "id": 21,
+    "offset": 3552,
+    "file": "r",
+    "size": 84,
+    "format": "sprite frame metadata",
+    "sheet": "au.png",
+    "frames": [
+      276,
+      282
+    ]
+  },
+  {
+    "id": 22,
+    "offset": 3636,
+    "file": "r",
+    "size": 84,
+    "format": "sprite frame metadata",
+    "sheet": "av.png",
+    "frames": [
+      282,
+      288
+    ]
+  },
+  {
+    "id": 23,
+    "offset": 3720,
+    "file": "r",
+    "size": 48,
+    "format": "sprite frame metadata",
+    "sheet": "aw.png",
+    "frames": [
+      288,
+      291
+    ]
+  },
+  {
+    "id": 24,
+    "offset": 3768,
+    "file": "r",
+    "size": 84,
+    "format": "sprite frame metadata",
+    "sheet": "ax.png",
+    "frames": [
+      291,
+      297
+    ]
+  },
+  {
+    "id": 25,
+    "offset": 3852,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "ay.png",
+    "frames": [
+      297,
+      298
+    ]
+  },
+  {
+    "id": 26,
+    "offset": 3876,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "az.png",
+    "frames": [
+      298,
+      299
+    ]
+  },
+  {
+    "id": 27,
+    "offset": 3900,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "ba.png",
+    "frames": [
+      299,
+      300
+    ]
+  },
+  {
+    "id": 28,
+    "offset": 3924,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bb.png",
+    "frames": [
+      300,
+      301
+    ]
+  },
+  {
+    "id": 29,
+    "offset": 3948,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bc.png",
+    "frames": [
+      301,
+      302
+    ]
+  },
+  {
+    "id": 30,
+    "offset": 3972,
+    "file": "r",
+    "size": 36,
+    "format": "sprite frame metadata",
+    "sheet": "bd.png",
+    "frames": [
+      302,
+      304
+    ]
+  },
+  {
+    "id": 31,
+    "offset": 4008,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "be.png",
+    "frames": [
+      304,
+      305
+    ]
+  },
+  {
+    "id": 32,
+    "offset": 4032,
+    "file": "r",
+    "size": 132,
+    "format": "sprite frame metadata",
+    "sheet": "bf.png",
+    "frames": [
+      305,
+      315
+    ]
+  },
+  {
+    "id": 33,
+    "offset": 4164,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bg.png",
+    "frames": [
+      315,
+      316
+    ]
+  },
+  {
+    "id": 34,
+    "offset": 4188,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bh.png",
+    "frames": [
+      316,
+      317
+    ]
+  },
+  {
+    "id": 35,
+    "offset": 4212,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bi.png",
+    "frames": [
+      317,
+      318
+    ]
+  },
+  {
+    "id": 36,
+    "offset": 4236,
+    "file": "r",
+    "size": 36,
+    "format": "sprite frame metadata",
+    "sheet": "bj.png",
+    "frames": [
+      318,
+      320
+    ]
+  },
+  {
+    "id": 37,
+    "offset": 4272,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bk.png",
+    "frames": [
+      320,
+      321
+    ]
+  },
+  {
+    "id": 38,
+    "offset": 4296,
+    "file": "r",
+    "size": 120,
+    "format": "sprite frame metadata",
+    "sheet": "bl.png",
+    "frames": [
+      321,
+      330
+    ]
+  },
+  {
+    "id": 39,
+    "offset": 4416,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bm.png",
+    "frames": [
+      330,
+      331
+    ]
+  },
+  {
+    "id": 40,
+    "offset": 4440,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bn.png",
+    "frames": [
+      331,
+      332
+    ]
+  },
+  {
+    "id": 41,
+    "offset": 4464,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bo.png",
+    "frames": [
+      332,
+      333
+    ]
+  },
+  {
+    "id": 42,
+    "offset": 4488,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bp.png",
+    "frames": [
+      333,
+      334
+    ]
+  },
+  {
+    "id": 43,
+    "offset": 4512,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bq.png",
+    "frames": [
+      334,
+      335
+    ]
+  },
+  {
+    "id": 44,
+    "offset": 4536,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "br.png",
+    "frames": [
+      335,
+      336
+    ]
+  },
+  {
+    "id": 45,
+    "offset": 4560,
+    "file": "r",
+    "size": 132,
+    "format": "sprite frame metadata",
+    "sheet": "bs.png",
+    "frames": [
+      336,
+      346
+    ]
+  },
+  {
+    "id": 46,
+    "offset": 4692,
+    "file": "r",
+    "size": 144,
+    "format": "sprite frame metadata",
+    "sheet": "bt.png",
+    "frames": [
+      346,
+      357
+    ]
+  },
+  {
+    "id": 47,
+    "offset": 4836,
+    "file": "r",
+    "size": 48,
+    "format": "sprite frame metadata",
+    "sheet": "bu.png",
+    "frames": [
+      357,
+      360
+    ]
+  },
+  {
+    "id": 48,
+    "offset": 4884,
+    "file": "r",
+    "size": 96,
+    "format": "sprite frame metadata",
+    "sheet": "bv.png",
+    "frames": [
+      360,
+      367
+    ]
+  },
+  {
+    "id": 49,
+    "offset": 4980,
+    "file": "r",
+    "size": 96,
+    "format": "sprite frame metadata",
+    "sheet": "bw.png",
+    "frames": [
+      367,
+      374
+    ]
+  },
+  {
+    "id": 50,
+    "offset": 5076,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bx.png",
+    "frames": [
+      374,
+      375
+    ]
+  },
+  {
+    "id": 51,
+    "offset": 5100,
+    "file": "r",
+    "size": 60,
+    "format": "sprite frame metadata",
+    "sheet": "by.png",
+    "frames": [
+      375,
+      379
+    ]
+  },
+  {
+    "id": 52,
+    "offset": 5160,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "bz.png",
+    "frames": [
+      379,
+      380
+    ]
+  },
+  {
+    "id": 53,
+    "offset": 5184,
+    "file": "r",
+    "size": 36,
+    "format": "sprite frame metadata",
+    "sheet": "ca.png",
+    "frames": [
+      380,
+      382
+    ]
+  },
+  {
+    "id": 54,
+    "offset": 5220,
+    "file": "r",
+    "size": 36,
+    "format": "sprite frame metadata",
+    "sheet": "cb.png",
+    "frames": [
+      382,
+      384
+    ]
+  },
+  {
+    "id": 55,
+    "offset": 5256,
+    "file": "r",
+    "size": 24,
+    "format": "sprite frame metadata",
+    "sheet": "cc.png",
+    "frames": [
+      384,
+      385
+    ]
+  },
+  {
+    "id": 56,
+    "offset": 5280,
+    "file": "r",
+    "size": 276,
+    "format": "sprite frame metadata",
+    "sheet": "cd.png",
+    "frames": [
+      385,
+      407
+    ]
+  },
+  {
+    "id": 57,
+    "offset": 5556,
+    "file": "r",
+    "size": 132,
+    "format": "sprite frame metadata",
+    "sheet": "ce.png",
+    "frames": [
+      407,
+      417
+    ]
+  },
+  {
+    "id": 58,
+    "offset": 0,
+    "file": "cf.mid",
+    "size": 15143,
+    "format": "Standard MIDI"
+  },
+  {
+    "id": 59,
+    "offset": 0,
+    "file": "cg.mid",
+    "size": 29393,
+    "format": "Standard MIDI"
+  },
+  {
+    "id": 60,
+    "offset": 0,
+    "file": "ch.mid",
+    "size": 19274,
+    "format": "Standard MIDI"
+  },
+  {
+    "id": 61,
+    "offset": 0,
+    "file": "ci.mid",
+    "size": 9629,
+    "format": "Standard MIDI"
+  },
+  {
+    "id": 62,
+    "offset": 0,
+    "file": "cj.mid",
+    "size": 16207,
+    "format": "Standard MIDI"
+  },
+  {
+    "id": 63,
+    "offset": 0,
+    "file": "ck.bin",
+    "size": 7530,
+    "format": "complete world, packed creatures, objects, items, decorations",
+    "dimensions": [
+      30,
+      40
+    ]
+  }
+]

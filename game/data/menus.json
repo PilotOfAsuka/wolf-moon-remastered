@@ -1,0 +1,556 @@
+{
+  "header": 9,
+  "menus": [
+    {
+      "id": 0,
+      "title": 8,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 1,
+          "text": 0,
+          "event": 0,
+          "target": -1
+        },
+        {
+          "key": 2,
+          "text": 1,
+          "event": 19,
+          "target": -1
+        }
+      ],
+      "rows": [
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 19,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 25,
+          "target": -1
+        },
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 12,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 26,
+          "target": -1
+        },
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 35,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 1,
+          "target": 6
+        },
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 13,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 1,
+          "target": 1
+        },
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 14,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 28,
+          "target": -1
+        },
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 15,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 17,
+          "target": -1
+        },
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 1,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 19,
+          "target": -1
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "title": 13,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 1,
+          "text": 0,
+          "event": 0,
+          "target": -1
+        },
+        {
+          "key": 2,
+          "text": 2,
+          "event": 1,
+          "target": 0
+        }
+      ],
+      "rows": [
+        {
+          "type": 2,
+          "variants": [
+            {
+              "text": 50,
+              "sprite": -1,
+              "flags": 2
+            },
+            {
+              "text": 51,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 2,
+          "target": -1
+        },
+        {
+          "type": 2,
+          "variants": [
+            {
+              "text": 18,
+              "sprite": -1,
+              "flags": 2
+            },
+            {
+              "text": 17,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 3,
+          "target": -1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": 10,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 1,
+          "text": 4,
+          "event": 24,
+          "target": -1
+        },
+        {
+          "key": 2,
+          "text": 5,
+          "event": 1,
+          "target": 0
+        }
+      ],
+      "rows": [
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 20,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": 10,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 1,
+          "text": 3,
+          "event": 0,
+          "target": -1
+        },
+        {
+          "key": 2,
+          "text": 2,
+          "event": 1,
+          "target": 0
+        }
+      ],
+      "rows": [
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 46,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 1,
+          "variants": [
+            {
+              "text": 44,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 16,
+          "target": -1
+        },
+        {
+          "type": 2,
+          "variants": [
+            {
+              "text": 40,
+              "sprite": -1,
+              "flags": 2
+            },
+            {
+              "text": 41,
+              "sprite": -1,
+              "flags": 2
+            },
+            {
+              "text": 42,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 4,
+          "target": -1
+        },
+        {
+          "type": 2,
+          "variants": [
+            {
+              "text": 39,
+              "sprite": -1,
+              "flags": 2
+            },
+            {
+              "text": 38,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": 5,
+          "target": -1
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": 10,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 1,
+          "text": 4,
+          "event": 9,
+          "target": -1
+        },
+        {
+          "key": 2,
+          "text": 5,
+          "event": 10,
+          "target": -1
+        }
+      ],
+      "rows": [
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 11,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": 14,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 2,
+          "text": 2,
+          "event": 1,
+          "target": 0
+        }
+      ],
+      "rows": []
+    },
+    {
+      "id": 6,
+      "title": 35,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 2,
+          "text": 2,
+          "event": 1,
+          "target": 0
+        }
+      ],
+      "rows": []
+    },
+    {
+      "id": 7,
+      "title": 8,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 1,
+          "text": 4,
+          "event": 14,
+          "target": -1
+        },
+        {
+          "key": 2,
+          "text": 5,
+          "event": 15,
+          "target": -1
+        }
+      ],
+      "rows": [
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 37,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": 8,
+      "sprite": -1,
+      "flags": 0,
+      "softkeys": [
+        {
+          "key": 2,
+          "text": 2,
+          "event": 1,
+          "target": 0
+        }
+      ],
+      "rows": [
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 21,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 22,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 23,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 24,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 25,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 43,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 26,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 27,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 28,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 29,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 30,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 31,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        },
+        {
+          "type": 0,
+          "variants": [
+            {
+              "text": 32,
+              "sprite": -1,
+              "flags": 2
+            }
+          ],
+          "event": -1,
+          "target": -1
+        }
+      ]
+    }
+  ]
+}

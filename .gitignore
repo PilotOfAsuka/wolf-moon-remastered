@@ -1,0 +1,11 @@
+game/.godot/
+build/
+tools/vendor/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Local original archive and reverse-engineering outputs are never published.
+research/
+*.jar
+docs/USER_REQUEST_RU.md
