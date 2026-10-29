@@ -1,6 +1,6 @@
 # Wolf Moon: Remastered
 
-**[▶ Играть в браузере / Play in your browser](https://pilotofasuka.github.io/wolf-moon-remastered/)**
+**[▶ Играть в браузере / Play in your browser](https://pilotofasuka.github.io/wolfmoon-remastered/)**
 
 ## Русский
 
