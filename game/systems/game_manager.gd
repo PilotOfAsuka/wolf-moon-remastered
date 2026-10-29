@@ -36,6 +36,8 @@ func release_state() -> void:
 func close() -> void:
 	release_state()
 	vm.intrinsics.vm=null
+	vm.intrinsics.renderer.vm=null
+	vm.intrinsics.renderer.sprites=null
 	platform.vm=null
 	vm.native=null
 
@@ -65,6 +67,15 @@ func key(raw: int) -> void:
 func key_release(raw: int) -> void:
 	var canvas: Variant = vm.get_static("m","a","Lo;")
 	if canvas!=null: vm.launch("o","keyReleased(I)V",canvas,[raw])
+
+func rest() -> void:
+	if screen_type()!="i":return
+	var state: Dictionary=WolfPresentationState.new(vm).collect()
+	if not state.get("rest_available",false) or state.get("full_map",false):return
+	# Select the original virtual rest slot, then press Fire. The original game
+	# decides the duration, warmth bonus, transition, messages and autosave.
+	vm.launch("i","h(I)V",null,[int(state.rest_slot)-int(state.selected)])
+	key(-5)
 
 func screen_type() -> String:
 	var value: Variant = vm.get_static("m","a","Lp;")

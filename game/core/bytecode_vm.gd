@@ -16,6 +16,9 @@ var errors: Array[String] = []
 var trace: Array[String] = []
 var halted: bool = false
 var max_slice: int = 45000
+var profile_enabled: bool = false
+var profile_instructions: Dictionary = {}
+var field_owner_cache: Dictionary = {}
 var next_id: int = 1
 var active: Dictionary = {}
 var exception: Variant = null
@@ -76,10 +79,14 @@ func new_array(type: String, length: int) -> WMObject:
 	return o
 
 func field_owner(cl: String, name: String, desc: String) -> String:
+	var key: String=cl+"."+name+":"+desc
+	if field_owner_cache.has(key):return field_owner_cache[key]
 	while classes.has(cl):
 		for field: Dictionary in classes[cl].fields:
-			if field.name == name and field.desc == desc: return cl
+			if field.name == name and field.desc == desc:
+				field_owner_cache[key]=cl;return cl
 		cl = classes[cl].parent if classes[cl].parent != null else ""
+	field_owner_cache[key]=cl
 	return cl
 
 func get_static(cl: String, name: String, desc: String) -> Variant:
@@ -130,10 +137,27 @@ func push_frame(fiber: Dictionary, owner: String, method: Dictionary, obj: Varia
 		locals[n] = args[k]
 		n += 2 if method.params[k] in ["J","D"] else 1
 	var capture: Variant=null
-	if owner=="i" and method.name=="b" and method.desc=="(Ljavax/microedition/lcdui/Graphics;)V" and not args.is_empty() and args[0]!=null:
-		capture=args[0].data
-		capture.begin_capture()
-	fiber.frames.append({"owner":owner,"method":method,"pc":0,"last":0,"locals":locals,"stack":[],"lock":null,"entered":false,"this":obj,"capture":capture})
+	var phase_graphics: Variant=null
+	var previous_phase: String=""
+	if owner=="i" and method.desc=="(Ljavax/microedition/lcdui/Graphics;)V" and not args.is_empty() and args[0]!=null:
+		var phase: String=""
+		if method.name=="a":phase="effects"
+		elif method.name=="b":phase="base"
+		elif method.name=="d":phase="sky"
+		elif method.name in ["i","j","k"]:phase="interaction_"+str(method.name)
+		elif method.name=="f":phase="hud"
+		elif method.name=="h":phase="map"
+		elif method.name=="n":phase="transition"
+		if not phase.is_empty():
+			phase_graphics=args[0].data;previous_phase=phase_graphics.phase;phase_graphics.phase=phase
+		if method.name in ["a","b"]:
+			capture=args[0].data;capture.begin_capture()
+	fiber.frames.append({"owner":owner,"method":method,"pc":0,"last":0,"locals":locals,"stack":[],"lock":null,"entered":false,"this":obj,"capture":capture,"phase_graphics":phase_graphics,"previous_phase":previous_phase,"profile_key":owner+"."+str(method.name)+str(method.desc)})
+
+func finish_frame(frame: Dictionary) -> void:
+	if frame.get("lock")!=null:release(frame.lock)
+	if frame.get("capture")!=null:frame.capture.end_capture()
+	if frame.get("phase_graphics")!=null:frame.phase_graphics.phase=frame.get("previous_phase","")
 
 func acquire(lock: WMObject, fiber: Dictionary, depth: int = 1) -> bool:
 	var owner: int = int(lock.extra.get("monitor_owner",0))
@@ -205,8 +229,7 @@ func unwind(fiber: Dictionary) -> void:
 				frame.stack.append(thrown)
 				frame.pc = int(handler.handler)
 				return
-		if frame.get("lock")!=null: release(frame.lock)
-		if frame.get("capture")!=null: frame.capture.end_capture()
+		finish_frame(frame)
 		fiber.frames.pop_back()
 	fail("Uncaught " + thrown.type + ": " + str(thrown.data))
 
@@ -238,6 +261,9 @@ func step(fiber: Dictionary) -> void:
 	frame.last = pc
 	instructions += 1
 	opcode_hits[op] = int(opcode_hits.get(op,0)) + 1
+	if profile_enabled:
+		var profile_key: String=frame.get("profile_key",str(frame.owner)+"."+str(frame.method.name)+str(frame.method.desc))
+		profile_instructions[profile_key]=int(profile_instructions.get(profile_key,0))+1
 	var stack: Array = frame.stack
 	var locals: Array = frame.locals
 	match op:
@@ -347,8 +373,7 @@ func step(fiber: Dictionary) -> void:
 		172,173,176,177:
 			var result: Variant = null if op==177 else stack.pop_back()
 			if frame.method.name == "<clinit>": initialized[frame.owner] = true; initializing.erase(frame.owner)
-			if frame.lock!=null: release(frame.lock)
-			if frame.get("capture")!=null: frame.capture.end_capture()
+			finish_frame(frame)
 			fiber.frames.pop_back()
 			if not fiber.frames.is_empty() and op != 177: fiber.frames.back().stack.append(result)
 			else: fiber.result = result

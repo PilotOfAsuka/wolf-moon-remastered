@@ -25,6 +25,9 @@ func run() -> void:
 	var graphics: WMObject=main.game.vm.get_static("i","b","Ljavax/microedition/lcdui/Graphics;")
 	var draw: Dictionary=main.game.vm.launch("i","b(Ljavax/microedition/lcdui/Graphics;)V",null,[graphics])
 	while not draw.frames.is_empty() and not main.game.vm.halted:main.game.vm.tick(0)
+	var screen: WMObject=main.game.vm.get_static("m","a","Lp;")
+	var overlay: Dictionary=main.game.vm.launch("i","a(Ljavax/microedition/lcdui/Graphics;)V",screen,[main.game.platform.screen])
+	while not overlay.frames.is_empty() and not main.game.vm.halted:main.game.vm.tick(0)
 	main.game.vm.fibers=fibers
 	main.layout_screen()
 	await create_timer(0.5).timeout

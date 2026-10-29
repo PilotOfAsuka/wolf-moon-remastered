@@ -23,6 +23,7 @@ var presentation: WolfPresentationState
 var blend: float=0.0
 var transition: Tween
 var classic_backdrop: ColorRect
+var status_key: String=""
 
 func _ready() -> void:
 	if OS.has_feature("web"):
@@ -161,6 +162,11 @@ func build_ui() -> void:
 
 func layout_screen() -> void:
 	if display==null: return
+	if modern_ui!=null:
+		var ui_scale: float=clampf(minf(size.x/1440.0,size.y/810.0),0.85,3.0)
+		modern_ui.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+		modern_ui.scale=Vector2.ONE*ui_scale;modern_ui.size=size/ui_scale
+		modern_container.offset_bottom=-modern_ui.hud_reserve*ui_scale if modern_ui.hud.visible else 0
 	header_title.text="W O L F   M O O N" if size.x>=600 else "WOLF MOON"
 	header_title.add_theme_font_size_override("font_size",26 if size.x>=600 else 20)
 	for name: String in ["left","right"]: page_margin.add_theme_constant_override("margin_"+name,12 if size.x<400 else 24)
@@ -193,6 +199,7 @@ func build_modern() -> void:
 	modern_ui.classic_requested.connect(toggle_mode)
 	modern_ui.save_requested.connect(save_snapshot);modern_ui.load_requested.connect(load_snapshot)
 	modern_ui.inventory_selected.connect(func(id: int) -> void: game.vm.launch("i","i(I)V",null,[id]))
+	modern_ui.rest_requested.connect(game.rest)
 	modern_ui.menu_selected.connect(func(index: int,variant: bool) -> void:
 		var screen: Variant=game.vm.get_static("m","a","Lp;")
 		if screen!=null and screen.type=="j":
@@ -212,7 +219,7 @@ func toggle_mode() -> void:
 	if transition!=null and transition.is_running():transition.kill()
 	page_margin.visible=true;classic_backdrop.visible=true
 	modern_container.visible=true;modern_ui.visible=true
-	game.vm.max_slice=5000
+	game.vm.max_slice=45000
 	transition=create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	transition.tween_method(apply_blend,blend,1.0 if remastered else 0.0,0.4)
 	transition.finished.connect(func() -> void:
@@ -234,16 +241,22 @@ func _process(delta: float) -> void:
 	game.tick(elapsed)
 	if game.platform.exit_requested: get_tree().quit(); return
 	if transcript!=null: transcript.text = game.platform.screen.data.transcript()
-	if not game.vm.errors.is_empty(): status.text = "Ошибка ядра — подробности в журнале"
+	if not game.vm.errors.is_empty():status_key="core_error"
 	if remastered or (transition!=null and transition.is_running()):
 		var state: Dictionary=presentation.collect()
-		modern_world.synchronize(state,delta)
 		modern_ui.update_state(state)
+		modern_container.offset_bottom=-modern_ui.hud_reserve*modern_ui.scale.y if modern_ui.hud.visible else 0
+		state.ui_scale=modern_ui.scale.y
+		modern_world.synchronize(state,delta)
+		status.text=localized_status()
 		modern_ui.message.text=status.text
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or event.echo: return
 	var code: int = event.physical_keycode
+	if code==KEY_R:
+		if event.pressed:game.rest()
+		get_viewport().set_input_as_handled();return
 	if code in [KEY_F2,KEY_F5,KEY_F9]:
 		if event.pressed:
 			if code==KEY_F2: toggle_mode()
@@ -253,6 +266,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var mapping: Dictionary = {KEY_UP:-1,KEY_W:-1,KEY_DOWN:-2,KEY_S:-2,KEY_LEFT:-3,KEY_A:-3,KEY_RIGHT:-4,KEY_D:-4,KEY_ENTER:-5,KEY_SPACE:-5,KEY_ESCAPE:-6,KEY_TAB:-7,KEY_BACKSPACE:-7,KEY_ASTERISK:42,KEY_NUMBERSIGN:35}
 	var raw: int = -999
 	if mapping.has(code): raw=mapping[code]
+	if code==KEY_ESCAPE:
+		var screen: String=game.screen_type()
+		raw=-7 if screen in ["j","d"] else (53 if screen=="b" else (51 if int(game.vm.get_static("i","h","Z"))!=0 else -6))
+	elif code in [KEY_Q,KEY_E,KEY_J,KEY_M]:raw={KEY_Q:55,KEY_E:57,KEY_J:49,KEY_M:51}[code]
 	elif code>=KEY_0 and code<=KEY_9: raw=48+code-KEY_0
 	elif code>=KEY_KP_0 and code<=KEY_KP_9: raw=48+code-KEY_KP_0
 	if raw!=-999:
@@ -266,10 +283,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		if mapping.has(event.button_index): game.key(mapping[event.button_index])
 
 func save_snapshot() -> void:
-	status.text = "Сохранено" if snapshot.save_game(game,"user://quicksave.wms") else "Не удалось сохранить"
+	status_key="saved" if snapshot.save_game(game,"user://quicksave.wms") else "save_failed"
+	status.text=localized_status()
 
 func load_snapshot() -> void:
-	status.text = "Загружено" if snapshot.load_game(game,"user://quicksave.wms") else "Сохранение не найдено или повреждено"
+	status_key="loaded" if snapshot.load_game(game,"user://quicksave.wms") else "load_failed"
+	status.text=localized_status()
+
+func localized_status() -> String:
+	var messages: Dictionary={"saved":["Сохранено","Saved"],"save_failed":["Не удалось сохранить","Save failed"],"loaded":["Загружено","Loaded"],"load_failed":["Сохранение не найдено или повреждено","Save not found or corrupted"],"core_error":["Ошибка игры — подробности в журнале","Game error — see log"]}
+	if not messages.has(status_key):return ""
+	return modern_ui.t(messages[status_key][0],messages[status_key][1])
 
 func _exit_tree() -> void:
 	if game!=null: game.close()

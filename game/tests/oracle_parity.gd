@@ -104,4 +104,5 @@ func run() -> void:
 	WolfGameManager.clear_graph([vm.statics,vm.fibers,vm.class_locks,platform.screen,platform.display,platform.image_cache])
 	vm.statics.clear(); vm.fibers.clear(); vm.class_locks.clear(); platform.image_cache.clear(); vm.active.clear()
 	platform.vm=null; vm.native=null; vm.intrinsics.vm=null
+	vm.intrinsics.renderer.vm=null;vm.intrinsics.renderer.sprites=null
 	quit(result)

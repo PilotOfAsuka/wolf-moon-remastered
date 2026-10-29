@@ -16,7 +16,7 @@ func encode(value: Variant) -> Variant:
 		if value is WMObject: data = {"kind":"object","type":value.type,"fields":encode(value.fields),"data":encode(value.data),"extra":encode(value.extra)}
 		elif value is WMLong: data = {"kind":"long","value":value.value}
 		elif value is Image: data = {"kind":"image","png":value.save_png_to_buffer()}
-		else: data = {"kind":"graphics","surface":encode(value.surface),"clip":value.clip,"offset":value.offset,"color":value.color,"bold":value.font_bold,"text_runs":encode(value.text_runs),"commands":encode(value.commands),"pending":encode(value.pending_commands),"capture_depth":value.capture_depth,"revision":value.revision}
+		else: data = {"kind":"graphics","surface":encode(value.surface),"clip":value.clip,"offset":value.offset,"color":value.color,"bold":value.font_bold,"text_runs":encode(value.text_runs),"commands":encode(value.commands),"pending":encode(value.pending_commands),"capture_depth":value.capture_depth,"revision":value.revision,"phase":value.phase}
 		nodes[n] = data
 		return {"$ref":n}
 	if value is Array:
@@ -101,6 +101,7 @@ func load_file(game: WolfGameManager,path: String) -> bool:
 			value.commands.assign(decode(node.get("commands",[])))
 			value.pending_commands.assign(decode(node.get("pending",[])))
 			value.capture_depth=int(node.get("capture_depth",0));value.revision=int(node.get("revision",0))
+			value.phase=str(node.get("phase",""))
 	var roots: Dictionary = decode(graph.root)
 	if not roots.has_all(["statics","fibers","initialized","initializing","locks","now","epoch","next_id","screen","display","random_serial","records","images"]): return false
 	# Validate all resumed frames before replacing live state.

@@ -17,6 +17,7 @@ var pending_commands: Array[Dictionary] = []
 var capture_depth: int = 0
 var revision: int = 0
 var suppress_capture: bool = false
+var phase: String = ""
 
 func begin_capture() -> void:
 	if capture_depth==0: pending_commands.clear()
@@ -33,6 +34,7 @@ func record(command: Dictionary) -> void:
 	if capture_depth>0 and not suppress_capture:
 		command.clip=clip
 		command.color=color
+		command.phase=phase
 		pending_commands.append(command)
 
 func record_sprite(id: int,x: int,y: int,group: Vector2,group_type: int,coverage: Rect2i=Rect2i()) -> void:
@@ -73,6 +75,10 @@ func pixel(x: int,y: int) -> void:
 
 func line(x: int,y: int,ex: int,ey: int) -> void:
 	record({"kind":"line","a":Vector2(x,y)+Vector2(offset),"b":Vector2(ex,ey)+Vector2(offset)})
+	if x==ex or y==ey:
+		var rect: Rect2i=Rect2i(Vector2i(mini(x,ex),mini(y,ey))+offset,Vector2i(absi(ex-x)+1,absi(ey-y)+1)).intersection(clip)
+		if rect.has_area():surface.fill_rect(rect,color);dirty=true
+		return
 	var dx: int = absi(ex-x); var dy: int = -absi(ey-y)
 	var sx: int = 1 if x<ex else -1; var sy: int = 1 if y<ey else -1
 	var err: int = dx+dy

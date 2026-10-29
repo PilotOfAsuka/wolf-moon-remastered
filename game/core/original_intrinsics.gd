@@ -4,19 +4,35 @@ extends RefCounted
 ## Every shortcut is optional; tests compare interpreter and intrinsic paths.
 var vm: WolfVM
 var enabled: bool = true
+var fast_render: bool = true
 var hits: Dictionary = {}
-const METHODS: Array[String] = ["c.a(IIILjavax/microedition/lcdui/Graphics;)V","c.a(II)I","c.b(I)Ljava/lang/Object;","c.a(I)Ljava/lang/String;","i.a(B)I","i.a(BBII)I"]
+var renderer: WolfRenderIntrinsics
+const METHODS: Array[String] = ["c.a(IIILjavax/microedition/lcdui/Graphics;)V","c.a(II)I","c.b(I)Ljava/lang/Object;","c.a(I)Ljava/lang/String;","i.a(B)I","i.a(BBII)I","i.a(IILjava/util/Random;)I","i.f(I)I","i.a(IIIIIIILjavax/microedition/lcdui/Graphics;)V","i.a(IIIIIIIIIIIIILjavax/microedition/lcdui/Graphics;IZ)V","i.b(BBII)Z","i.a(BBI)Z"]
+const FAST_METHODS: Array[String]=["i.a(IILjava/util/Random;)I","i.f(I)I","i.a(IIIIIIILjavax/microedition/lcdui/Graphics;)V","i.a(IIIIIIIIIIIIILjavax/microedition/lcdui/Graphics;IZ)V","i.b(BBII)Z","i.a(BBI)Z"]
 
 func _init(machine: WolfVM) -> void:
 	vm = machine
+	renderer=WolfRenderIntrinsics.new(machine,self)
 
 func accepts(owner: String,key: String) -> bool:
-	return enabled and (owner+"."+key) in METHODS
+	return enabled and (owner+"."+key) in METHODS and (fast_render or not (owner+"."+key) in FAST_METHODS)
 
 func invoke(owner: String,key: String,args: Array) -> Variant:
 	var method: String = owner+"."+key
 	hits[method] = int(hits.get(method,0))+1
 	match method:
+		"i.a(IILjava/util/Random;)I":return renderer.random_range(int(args[0]),int(args[1]),args[2])
+		"i.f(I)I":return clampi(int(args[0]),0,255)
+		"i.a(IIIIIIILjavax/microedition/lcdui/Graphics;)V":renderer.ground(args);return null
+		"i.a(IIIIIIIIIIIIILjavax/microedition/lcdui/Graphics;IZ)V":renderer.gradient(args);return null
+		"i.b(BBII)Z","i.a(BBI)Z":
+			var types: Array=vm.get_static("i","r","[B").data;var xs: Array=vm.get_static("i","s","[B").data
+			var ys: Array=vm.get_static("i","t","[B").data;var states: Array=vm.get_static("i","u","[B").data
+			for index: int in types.size():
+				if int(xs[index])!=int(args[0]) or int(ys[index])!=int(args[1]) or int(types[index])!=int(args[2]):continue
+				if (int(states[index])!=int(args[3])) if args.size()==4 else (int(states[index])==2):continue
+				vm.get_static("i","f","[I").data[0]=index;return 1
+			return 0
 		"c.a(IIILjavax/microedition/lcdui/Graphics;)V":
 			# c.a(IIILGraphics;)V byte offsets 0..103: original metadata,
 			# m.a(Graphics,rect,[I) intersection, drawImage, restore clip.

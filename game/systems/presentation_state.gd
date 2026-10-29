@@ -24,6 +24,8 @@ func paragraphs(container: WMObject,cl: String) -> String:
 func collect() -> Dictionary:
 	var state: Dictionary={"screen":"","world_ready":false,"menu":[],"dialogue":"","story_sprite":-1,"inventory":[],"creatures":[],"objects":[],"items":[],"inside":false,"softkeys":[]}
 	var screen: Variant=vm.get_static("m","a","Lp;")
+	var language_cache: Array=array("c","b","[Ljava/lang/Object;")
+	state.locale="en" if language_cache.size()>0 and language_cache[0]!=null and language_cache[0].data.size()>4 and str(language_cache[0].data[4])=="Yes" else "ru"
 	if screen!=null:
 		state.screen=screen.type
 		var softkeys: Variant=vm.get_field(screen,"p","a","[Ljava/lang/String;")
@@ -43,17 +45,23 @@ func collect() -> Dictionary:
 	elif screen!=null and screen.type=="d":
 		state.dialogue=paragraphs(screen,"d")
 		state.story_sprite=vm.get_static("d","m","I")
+	var adapted: String=WolfControlText.adapt(state.dialogue)
+	state.tutorial=adapted!=state.dialogue;state.dialogue=adapted
 	if not vm.initialized.has("i") or array("i","s","[S").is_empty() or array("i","A","[B").is_empty(): return state
 	state.world_ready=true
 	var graphics: Variant=vm.get_static("i","b","Ljavax/microedition/lcdui/Graphics;")
 	if graphics!=null:
 		state.render_commands=graphics.data.commands
 		state.render_revision=graphics.data.revision
+	var overlay: MidpGraphics=vm.native.screen.data
+	state.overlay_commands=overlay.commands
+	state.overlay_revision=overlay.revision
 	var map_image: Variant=vm.get_static("i","a","Ljavax/microedition/lcdui/Image;")
 	if map_image!=null:state.map_image=map_image.data
 	state.x=vm.get_static("i","d","B");state.y=vm.get_static("i","e","B");state.facing=vm.get_static("i","h","B")
 	state.hour=vm.get_static("i","i","B");state.day=vm.get_static("i","A","I");state.stamina=vm.get_static("i","C","I")
 	state.inside=int(vm.get_static("i","c","Z"))!=0
+	state.full_map=int(vm.get_static("i","h","Z"))!=0
 	state.flashlight=int(vm.get_static("i","d","Z"))!=0
 	state.battle=int(vm.get_static("i","l","Z"))!=0
 	state.transformed=int(vm.get_static("i","C","Z"))!=0
@@ -77,6 +85,25 @@ func collect() -> Dictionary:
 	for n: int in types.size(): state.creatures.append({"type":types[n],"x":xs[n],"y":ys[n],"active":int(active[n])!=0})
 	var ot: Array=array("i","r","[B");var ox: Array=array("i","s","[B");var oy: Array=array("i","t","[B");var os: Array=array("i","u","[B")
 	for n: int in ot.size(): state.objects.append({"type":ot[n],"x":ox[n],"y":oy[n],"status":os[n]})
+	# The original inventory ends with a virtual Zzz slot (i.p), whose item ID
+	# is 69, outside h.b's item icons. Keep it as a fixed action beside the scroll.
+	state.rest_slot=int(vm.get_static("i","p","B"))
+	state.rest_available=rest_available(state)
 	var it: Array=array("i","w","[B");var ix: Array=array("i","x","[B");var iy: Array=array("i","y","[B");var ist: Array=array("i","z","[B")
 	for n: int in it.size(): state.items.append({"type":it[n],"x":ix[n],"y":iy[n],"status":ist[n]})
 	return state
+
+func rest_available(state: Dictionary) -> bool:
+	# Read-only equivalent of the virtual slot's original i.b()Z predicate.
+	# Actual rest still goes through keypad input and the original i.j()V handler.
+	var width: int=int(vm.get_static("i","b","B"))
+	var cells: Array=array("i","s","[S")
+	var at: int=int(state.x)+int(state.y)*width
+	if at<0 or at>=cells.size():return false
+	var tile: int=int(cells[at]);var shelter: int=(tile>>13)&7
+	var protected: bool=state.inside or int(vm.get_static("i","e","Z"))!=0 or shelter in [2,4]
+	if state.transformed or int(vm.get_static("i","m","I"))!=-1 or (tile&7)==7:return false
+	if (state.battle or int(vm.get_static("i","k","Z"))!=0) and not protected:return false
+	for object: Dictionary in state.objects:
+		if int(object.x)==int(state.x) and int(object.y)==int(state.y) and int(object.type)==5 and int(object.status)!=2:return false
+	return true

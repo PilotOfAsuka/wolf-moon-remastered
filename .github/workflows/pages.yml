@@ -1,6 +1,8 @@
 name: Publish Web to GitHub Pages
-# Explicit manual publication; building the private repository does not publish assets.
+# Web is the player-facing release; publish updates from main automatically.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
