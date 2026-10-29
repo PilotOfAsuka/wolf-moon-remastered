@@ -1,6 +1,6 @@
 # Wolf Moon: Remastered — Web build
 
-**[▶ Играть / Play](https://pilotofasuka.github.io/wolf-moon-remastered/)**
+**[▶ Играть / Play](https://pilotofasuka.github.io/wolfmoon-remastered/)**
 
 Готовая Web-версия фанатского ремастера Wolf Moon (2006), созданного PilotOfAsuka совместно с ИИ Codex. Запускается в браузере без установки.
 
