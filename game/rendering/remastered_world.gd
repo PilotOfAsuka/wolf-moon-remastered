@@ -12,10 +12,12 @@ var base_layer: WolfSceneLayer
 var sky_layer: WolfSceneLayer
 var cloud_layer: WolfCloudLayer
 var rain_layer: WolfRainLayer
+var lighting: WolfLightPalette=WolfLightPalette.new()
+var cloud_styles: Dictionary={}
 var overlay_layer: WolfSceneLayer
 var map_layer: WolfSceneLayer
 var logical_height: float=281.0
-const DRAW_SCHEMA: int=6
+const DRAW_SCHEMA: int=7
 var seen_schema: int=-1
 var pixel_scale: float=1.0
 var projection: Vector2=Vector2.ONE
@@ -29,13 +31,16 @@ func _ready() -> void:
  rain_layer=WolfRainLayer.new();add_child(rain_layer)
  overlay_layer=WolfSceneLayer.new();add_child(overlay_layer)
  map_layer=WolfSceneLayer.new();add_child(map_layer)
-func synchronize(state: Dictionary,_delta: float) -> void:
+ sky_layer.lighting=lighting;base_layer.lighting=lighting;overlay_layer.lighting=lighting;cloud_layer.lighting=lighting
+func synchronize(state: Dictionary,delta: float) -> void:
  if not state.get("world_ready",false) or not state.has("render_commands") or size.y<=0:return
  if map_layer==null:map_layer=WolfSceneLayer.new();add_child(map_layer)
  if seen_schema!=DRAW_SCHEMA:
   grass_textures.clear();last_revision=-1;last_overlay_revision=-1;last_size=Vector2.ZERO;seen_schema=DRAW_SCHEMA
  var changed_size: bool=last_size!=size
  pixel_scale=size.y/281.0;projection=Vector2(size.x/240.0,pixel_scale)
+ if lighting.synchronize(state,delta):
+  sky_layer.queue_redraw();base_layer.queue_redraw();overlay_layer.queue_redraw();cloud_layer.queue_redraw()
  if changed_size or last_revision!=int(state.render_revision):
   last_revision=int(state.render_revision);last_commands=state.render_commands
   rebuild_background(state.render_commands)
@@ -80,9 +85,14 @@ func texture_for(id: int) -> Texture2D:
  return textures[id]
 func project(point: Vector2,group: Vector2=Vector2(-9999,-9999)) -> Vector2:
  return Vector2(group.x*projection.x+(point.x-group.x)*pixel_scale,point.y*pixel_scale) if group.x>-9000 else point*projection
-func add_texture(plan: Array[Dictionary],texture: Texture2D,pos: Vector2,dims: Vector2,clip: Rect2) -> void:
+func add_texture(plan: Array[Dictionary],texture: Texture2D,pos: Vector2,dims: Vector2,clip: Rect2,sprite_id: int=-1) -> void:
  var visible: Rect2=Rect2(pos,dims).intersection(clip)
- if visible.has_area():plan.append({"kind":"texture","texture":texture,"rect":visible,"source":Rect2((visible.position-pos)/pixel_scale,visible.size/pixel_scale)})
+ if not visible.has_area():return
+ var item: Dictionary={"kind":"texture","texture":texture,"rect":visible,"source":Rect2((visible.position-pos)/pixel_scale,visible.size/pixel_scale)}
+ if sprite_id>=235 and sprite_id<=261:
+  var family: int=(sprite_id-235)%9
+  item.foliage=[texture_for(235+family),texture_for(244+family),texture_for(253+family)]
+ plan.append(item)
 func grass_texture(id: int) -> Texture2D:
  if grass_textures.has(id):return grass_textures[id]
  var source: Image=texture_for(id).get_image();source.convert(Image.FORMAT_RGBA8)
@@ -164,7 +174,13 @@ func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
     var dims: Vector2=Vector2(float(meta.rect[2]),float(meta.rect[3]))*pixel_scale
     if dims.x<=0 or dims.y<=0:continue
     if not overlay and phase=="sky" and id>=270 and id<=287:
-     plan.append({"kind":"cloud","texture":texture,"rect":Rect2(pos,dims),"clip":bounds,"depth":id%6})
+     # Loop clouds that are actually in this view. Off-screen source records
+     # must not wrap into the picture as extra copies.
+     if not Rect2(pos,dims).intersects(bounds):continue
+     var cloud_key: String=str(cmd.x)+":"+str(clip)
+     if id<282:cloud_styles[cloud_key]=270 if id<276 else 276
+     var day_id: int=int(cloud_styles.get(cloud_key,270))+id%6
+     plan.append({"kind":"cloud","texture":texture,"day_texture":texture_for(day_id),"night_texture":texture_for(282+id%6),"rect":Rect2(pos,dims),"clip":bounds,"depth":id%6})
      continue
     var coverage: Rect2=Rect2(cmd.get("coverage",Rect2i()));var fill: Rect2=bounds
     if coverage.has_area():fill=Rect2(Vector2(coverage.position.x*projection.x,bounds.position.y),Vector2(coverage.size.x*projection.x,bounds.size.y)).intersection(bounds)
@@ -178,7 +194,7 @@ func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
      var step: float=dims.x*0.75;var x: float=pos.x
      while x>fill.position.x:x-=step
      while x<fill.end.x:add_texture(plan,texture,Vector2(x,pos.y),dims,bounds);x+=step
-    else:add_texture(plan,texture,pos,dims,bounds)
+    else:add_texture(plan,texture,pos,dims,bounds,id)
    "rect":
     var rect: Rect2=Rect2(cmd.rect).intersection(clip)
     if rect.has_area():plan.append({"kind":"rect","rect":Rect2(project(rect.position,group),rect.size*(Vector2.ONE*pixel_scale if interaction else projection)),"color":cmd.color})
@@ -193,7 +209,10 @@ func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
       var t: float=qs[n]/ps[n]
       if ps[n]<0:low=maxf(low,t)
       else:high=minf(high,t)
-    if valid and low<=high:plan.append({"kind":"line","a":project(a+d*low,group),"b":project(a+d*high,group),"color":cmd.color,"width":maxf(1,pixel_scale)})
+    if valid and low<=high:
+     var item: Dictionary={"kind":"line","a":project(a+d*low,group),"b":project(a+d*high,group),"color":cmd.color,"width":maxf(1,pixel_scale)}
+     if cmd.has("lighting"):item.lighting=cmd.lighting
+     plan.append(item)
    "arc":
     var args: Array=cmd.args;var center: Vector2=Vector2(float(args[0])+float(args[2])/2,float(args[1])+float(args[3])/2)+Vector2(cmd.offset)
     var points: PackedVector2Array=[]
@@ -223,7 +242,7 @@ func append_horizon(plan: Array[Dictionary],parts: Array,until: float,first: boo
    var pos: Vector2=project(Vector2(cmd.x,cmd.y),group)-Vector2(float(meta.origin[0]),float(meta.origin[1]))*pixel_scale+Vector2(x-initial,0)
    var dims: Vector2=Vector2(float(meta.rect[2]),float(meta.rect[3]))*pixel_scale
    var clip: Rect2=Rect2(cmd.clip).intersection(Rect2(0,0,240,281))
-   add_texture(plan,tex,pos,dims,Rect2(clip.position*projection,clip.size*projection))
+   add_texture(plan,tex,pos,dims,Rect2(clip.position*projection,clip.size*projection),int(cmd.id))
   x+=step
 
 func append_grass(plan: Array[Dictionary],cmd: Dictionary) -> void:

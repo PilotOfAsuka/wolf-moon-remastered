@@ -6,6 +6,7 @@ var pixel_scale: float=1.0
 var animating: bool=true
 var elapsed: float=0.0
 var last_tick: int=0
+var lighting: WolfLightPalette
 
 func synchronize(next_clouds: Array[Dictionary],scale_factor: float) -> void:
 	# Camera changes use the new scene immediately. No post-step interpolation.
@@ -30,8 +31,8 @@ func _draw() -> void:
 	for cloud: Dictionary in clouds:
 		var original: Rect2=cloud.rect
 		var clip: Rect2=cloud.clip
-		var speed: float=(0.10+float(cloud.depth)*0.025)*pixel_scale
-		var span: float=clip.size.x+original.size.x*2.0
+		var speed: float=(0.45+float(cloud.depth)*0.06)*pixel_scale
+		var span: float=clip.size.x+original.size.x
 		if span<=0:continue
 		var x: float=clip.position.x+fposmod(original.position.x-clip.position.x+original.size.x-elapsed*speed,span)-original.size.x
 		var moving: Rect2=Rect2(Vector2(x,original.position.y),original.size)
@@ -39,4 +40,7 @@ func _draw() -> void:
 		if not visible_rect.has_area():continue
 		var texels: Vector2=Vector2(cloud.texture.get_size())/moving.size
 		var source: Rect2=Rect2((visible_rect.position-moving.position)*texels,visible_rect.size*texels)
-		draw_texture_rect_region(cloud.texture,visible_rect,source)
+		if lighting!=null:
+			draw_texture_rect_region(cloud.day_texture,visible_rect,source)
+			if lighting.cloud_night>0.001:draw_texture_rect_region(cloud.night_texture,visible_rect,source,Color(1,1,1,lighting.cloud_night))
+		else:draw_texture_rect_region(cloud.texture,visible_rect,source)

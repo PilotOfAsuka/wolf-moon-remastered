@@ -60,6 +60,11 @@ func collect() -> Dictionary:
 	if map_image!=null:state.map_image=map_image.data
 	state.x=vm.get_static("i","d","B");state.y=vm.get_static("i","e","B");state.facing=vm.get_static("i","h","B")
 	state.hour=vm.get_static("i","i","B");state.day=vm.get_static("i","A","I");state.stamina=vm.get_static("i","C","I")
+	var light_rows: Array=array("h","a","[[I")
+	var light_column: int=WolfLightPalette.column(int(state.hour))
+	state.light_palette=[]
+	for row: WMObject in light_rows:
+		state.light_palette.append(Color.hex((int(row.data[light_column])<<8)|255))
 	state.inside=int(vm.get_static("i","c","Z"))!=0
 	state.full_map=int(vm.get_static("i","h","Z"))!=0
 	state.flashlight=int(vm.get_static("i","d","Z"))!=0

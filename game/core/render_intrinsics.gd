@@ -93,6 +93,7 @@ func gradient(args: Array) -> void:
 	var n7: int=args[5];var n8: int=args[6];var n9: int=args[7];var n10: int=args[8]
 	var n11: int=args[9];var n12: int=args[10];var n13: int=args[11];var n14: int=args[12]
 	var graphics: MidpGraphics=args[13].data;var n15: int=args[14];var shore: bool=int(args[15])!=0
+	var capture_start: int=graphics.pending_commands.size()
 	var n22: int=n7;var n23: int=n9;var n24: int=n11;var n25: int=n13
 	var n26: int=n10-n8;var n27: int=n9-n7;var n28: int=n14-n12;var n29: int=n13-n11
 	var n30: int=n8;var n31: int=absi(n4-n3);var n32: int=n2
@@ -149,7 +150,9 @@ func gradient(args: Array) -> void:
 						flags[index]=1 if random_range(0,100,effects_random)<50 else 0
 						vm.set_static("i","a","S",WolfVM.signed(index+1,16))
 			n2-=1
-			if n2<=0:return
+			if n2<=0:
+				record_gradient_lighting(graphics,capture_start,n5,n6,n3,n4)
+				return
 		if not left_ready:
 			if left_steep:
 				if n17>=0:left_ready=true;n8+=n21;n17-=n27
@@ -164,3 +167,28 @@ func gradient(args: Array) -> void:
 			continue
 		if n16>=0:n11+=n18;n16-=n28
 		right_ready=true;n12+=n19;n16+=n29
+
+func record_gradient_lighting(graphics: MidpGraphics,start: int,from_rgb: int,to_rgb: int,top: int,bottom: int) -> void:
+	# Metadata only: the classic raster and the original random calls are intact.
+	if graphics.capture_depth<=0 or graphics.phase not in ["sky","base"]:return
+	var table: WMObject=vm.get_static("h","a","[[I")
+	if table==null:return
+	var column: int=WolfLightPalette.column(int(vm.get_static("i","i","B")))
+	var from_row: int=-1;var to_row: int=-1
+	var pairs: Array=[Vector2i(8,9)] if top==0 else [Vector2i(10,11)]
+	if graphics.phase!="sky":pairs=[Vector2i(0,1),Vector2i(2,3),Vector2i(4,5),Vector2i(6,7)]
+	for pair: Vector2i in pairs:
+		if int(table.data[pair.x].data[column])==from_rgb and int(table.data[pair.y].data[column])==to_rgb:
+			from_row=pair.x;to_row=pair.y;break
+	if from_row<0 or to_row<0:return
+	var source_from: Color=Color.hex((from_rgb<<8)|255)
+	var source_to: Color=Color.hex((to_rgb<<8)|255)
+	var difference: Vector3=Vector3(source_to.r-source_from.r,source_to.g-source_from.g,source_to.b-source_from.b)
+	var channel: int=difference.abs().max_axis_index()
+	for index: int in range(start,graphics.pending_commands.size()):
+		var command: Dictionary=graphics.pending_commands[index]
+		if command.kind!="line":continue
+		var amount: float=clampf((float(command.a.y)-graphics.offset.y-top)/maxi(1,bottom-top),0,1)
+		if absf(difference[channel])>0.001:
+			amount=clampf((float(command.color[channel])-float(source_from[channel]))/difference[channel],0,1)
+		command.lighting={"from":from_row,"to":to_row,"source_from":source_from,"source_to":source_to,"amount":amount}
