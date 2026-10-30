@@ -1,6 +1,6 @@
 # GitHub и Web
 
-[Репозиторий](https://github.com/PilotOfAsuka/wolf-moon-remastered) · [Играть в браузере](https://pilotofasuka.github.io/wolf-moon-remastered/)
+[Репозиторий](https://github.com/PilotOfAsuka/wolfmoon-remastered) · [Играть в браузере](https://pilotofasuka.github.io/wolfmoon-remastered/)
 
 - **godot** — основная ветка с исходным Godot-проектом.
 - **web-build** — готовый экспорт: index.html, JavaScript, WebAssembly и пакет игры в корне ветки.
