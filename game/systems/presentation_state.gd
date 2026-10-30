@@ -65,6 +65,14 @@ func collect() -> Dictionary:
 	state.flashlight=int(vm.get_static("i","d","Z"))!=0
 	state.battle=int(vm.get_static("i","l","Z"))!=0
 	state.transformed=int(vm.get_static("i","C","Z"))!=0
+	# These are the original rain painter's exposure and intensity conditions.
+	var weather_cells: Array=array("i","s","[S")
+	var weather_at: int=int(state.x)+int(state.y)*int(vm.get_static("i","b","B"))
+	var shelter: int=(int(weather_cells[weather_at])>>13)&7 if weather_at>=0 and weather_at<weather_cells.size() else 0
+	state.weather_exposed=not state.inside and int(vm.get_static("i","e","Z"))==0 and shelter not in [2,4]
+	state.rain_strength=clampf(float(vm.get_static("i","V","I"))/150.0,0.0,1.0) if int(vm.get_static("i","A","B"))!=0 else 0.0
+	var rain: Variant=vm.get_static("i","a","Lf;")
+	state.rain_wind=float(vm.get_field(rain,"f","c","I"))/16384.0 if rain is WMObject else 0.0
 	state.view_offsets=array("h","a","[[B")[int(state.facing)].data.duplicate()
 	state.object_icons=array("h","d","[S")
 	state.creature_icons=array("h","e","[S")

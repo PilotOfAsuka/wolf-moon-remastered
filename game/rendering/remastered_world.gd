@@ -9,10 +9,13 @@ var last_commands: Array=[]
 var textures: Dictionary={}
 var grass_textures: Dictionary={}
 var base_layer: WolfSceneLayer
+var sky_layer: WolfSceneLayer
+var cloud_layer: WolfCloudLayer
+var rain_layer: WolfRainLayer
 var overlay_layer: WolfSceneLayer
 var map_layer: WolfSceneLayer
 var logical_height: float=281.0
-const DRAW_SCHEMA: int=5
+const DRAW_SCHEMA: int=6
 var seen_schema: int=-1
 var pixel_scale: float=1.0
 var projection: Vector2=Vector2.ONE
@@ -20,7 +23,10 @@ var render_signature: String=""
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);mouse_filter=Control.MOUSE_FILTER_IGNORE;clip_contents=true
  sprites=JSON.parse_string(FileAccess.get_file_as_string("res://data/sprites.json"))
+ sky_layer=WolfSceneLayer.new();add_child(sky_layer)
+ cloud_layer=WolfCloudLayer.new();add_child(cloud_layer)
  base_layer=WolfSceneLayer.new();add_child(base_layer)
+ rain_layer=WolfRainLayer.new();add_child(rain_layer)
  overlay_layer=WolfSceneLayer.new();add_child(overlay_layer)
  map_layer=WolfSceneLayer.new();add_child(map_layer)
 func synchronize(state: Dictionary,_delta: float) -> void:
@@ -32,7 +38,7 @@ func synchronize(state: Dictionary,_delta: float) -> void:
  pixel_scale=size.y/281.0;projection=Vector2(size.x/240.0,pixel_scale)
  if changed_size or last_revision!=int(state.render_revision):
   last_revision=int(state.render_revision);last_commands=state.render_commands
-  base_layer.plan=prepare(state.render_commands,false);base_layer.queue_redraw()
+  rebuild_background(state.render_commands,int(state.get("facing",0)))
  if changed_size or last_overlay_revision!=int(state.get("overlay_revision",-1)):
   last_overlay_revision=int(state.get("overlay_revision",-1))
   overlay_layer.plan=prepare(state.get("overlay_commands",[]),true);overlay_layer.queue_redraw()
@@ -48,8 +54,24 @@ func synchronize(state: Dictionary,_delta: float) -> void:
   map_layer.queue_redraw();projection=world_projection;pixel_scale=world_scale;logical_height=281.0
  var show_map: bool=state.get("full_map",false)
  map_layer.visible=show_map;base_layer.visible=not show_map;overlay_layer.visible=not show_map
+ sky_layer.visible=not show_map;cloud_layer.visible=not show_map
+ cloud_layer.animating=state.get("screen","") in ["i","b"]
+ rain_layer.configure(state,size,pixel_scale)
  last_size=size
  render_signature="Wide Classic: %d base / %d overlay"%[base_layer.plan.size(),overlay_layer.plan.size()]
+
+func rebuild_background(commands: Array,facing: int) -> void:
+ var prepared: Array[Dictionary]=prepare(commands,false)
+ var before_clouds: Array[Dictionary]=[];var foreground: Array[Dictionary]=[];var clouds: Array[Dictionary]=[]
+ var found_cloud: bool=false
+ for item: Dictionary in prepared:
+  if item.kind=="cloud":clouds.append(item);found_cloud=true
+  elif found_cloud:foreground.append(item)
+  else:before_clouds.append(item)
+ sky_layer.plan=before_clouds if found_cloud else []
+ base_layer.plan=foreground if found_cloud else before_clouds
+ cloud_layer.synchronize(clouds,pixel_scale,facing)
+ sky_layer.queue_redraw();cloud_layer.queue_redraw();base_layer.queue_redraw()
 func texture_for(id: int) -> Texture2D:
  if not textures.has(id):
   var path: String="res://assets/sprites/%03d.png"%id
@@ -107,7 +129,7 @@ func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
  var panel_group: Vector2=Vector2(-9999,-9999);var previous_phase: String=""
  for cmd: Dictionary in commands:
   var phase: String=str(cmd.get("phase",""))
-  if overlay and (phase in ["hud","map"] or cmd.kind=="image"):continue
+  if overlay and (phase in ["hud","map","weather"] or cmd.kind=="image"):continue
   if phase!=previous_phase:panel_group=Vector2(-9999,-9999);previous_phase=phase
   var interaction: bool=phase.begins_with("interaction_")
   if interaction and cmd.kind=="rect" and cmd.rect.size.x>=14 and cmd.rect.size.y>=14 and cmd.color==Color.BLACK:panel_group=Rect2(cmd.rect).get_center()
@@ -141,6 +163,9 @@ func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
     var pos: Vector2=project(Vector2(cmd.x,cmd.y),group)-Vector2(float(meta.origin[0]),float(meta.origin[1]))*pixel_scale
     var dims: Vector2=Vector2(float(meta.rect[2]),float(meta.rect[3]))*pixel_scale
     if dims.x<=0 or dims.y<=0:continue
+    if not overlay and phase=="sky" and id>=270 and id<=287:
+     plan.append({"kind":"cloud","texture":texture,"rect":Rect2(pos,dims),"clip":bounds,"depth":id%6,"anchor":cmd.x})
+     continue
     var coverage: Rect2=Rect2(cmd.get("coverage",Rect2i()));var fill: Rect2=bounds
     if coverage.has_area():fill=Rect2(Vector2(coverage.position.x*projection.x,bounds.position.y),Vector2(coverage.size.x*projection.x,bounds.size.y)).intersection(bounds)
     if id==269 or phase=="transition":

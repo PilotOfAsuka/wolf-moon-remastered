@@ -144,6 +144,7 @@ func push_frame(fiber: Dictionary, owner: String, method: Dictionary, obj: Varia
 		if method.name=="a":phase="effects"
 		elif method.name=="b":phase="base"
 		elif method.name=="d":phase="sky"
+		elif method.name=="l":phase="weather"
 		elif method.name in ["i","j","k"]:phase="interaction_"+str(method.name)
 		elif method.name=="f":phase="hud"
 		elif method.name=="h":phase="map"
