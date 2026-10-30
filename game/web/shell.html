@@ -3,7 +3,7 @@
 <html lang="ru">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover">
 		<title>$GODOT_PROJECT_NAME</title>
 		<meta name="description" content="Wolf Moon: Remastered — фанатский ремастер мобильной игры 2006 года, созданный PilotOfAsuka совместно с ИИ Codex. A fan-made remaster created with Codex AI. Play in your browser.">
 		<meta property="og:title" content="Wolf Moon: Remastered">
@@ -12,6 +12,12 @@
 		<meta property="og:url" content="https://pilotofasuka.github.io/wolf-moon-remastered/">
 		<link rel="canonical" href="https://pilotofasuka.github.io/wolf-moon-remastered/">
 		<style>
+:root {
+	--wm-safe-left: env(safe-area-inset-left, 0px);
+	--wm-safe-top: env(safe-area-inset-top, 0px);
+	--wm-safe-right: env(safe-area-inset-right, 0px);
+	--wm-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
 html, body, #canvas {
 	margin: 0;
 	padding: 0;

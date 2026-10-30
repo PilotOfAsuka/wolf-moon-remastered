@@ -24,6 +24,7 @@ var blend: float=0.0
 var transition: Tween
 var classic_backdrop: ColorRect
 var status_key: String=""
+var classic_footer: Label
 
 func _ready() -> void:
 	if OS.has_feature("web"):
@@ -39,11 +40,17 @@ func _ready() -> void:
 	if not "--classic" in OS.get_cmdline_user_args(): toggle_mode()
 	resized.connect(layout_screen)
 	call_deferred("layout_screen")
+	if OS.has_feature("web"):call_deferred("configure_web_scale")
 
 func configure_web_scale() -> void:
 	var css_width: int=int(JavaScriptBridge.eval("window.innerWidth"))
-	var css_height: int=int(JavaScriptBridge.eval("window.innerHeight"))
+	var css_height: int=int(JavaScriptBridge.eval("window.visualViewport ? window.visualViewport.height : window.innerHeight"))
 	var target: Vector2i=Vector2i(css_width,css_height)
+	if modern_ui!=null:
+		var insets: Array=[]
+		for edge: String in ["left","top","right","bottom"]:
+			insets.append(float(JavaScriptBridge.eval("parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wm-safe-%s')) || 0"%edge)))
+		modern_ui.safe_insets=Vector4(insets[0],insets[1],insets[2],insets[3])/maxf(1,modern_ui.scale.x)
 	if get_window().content_scale_size==target:return
 	get_window().content_scale_mode=Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	get_window().content_scale_size=target
@@ -52,6 +59,8 @@ func button(parent: Node,text: String,action: Callable) -> Button:
 	var b: Button = Button.new()
 	b.text = text
 	WolfDirectionIcons.apply(b)
+	WolfRemasteredUI.style_button(b,6)
+	b.expand_icon=true;b.add_theme_constant_override("icon_max_width",24)
 	b.custom_minimum_size = Vector2(72,44)
 	b.focus_mode = Control.FOCUS_NONE
 	b.pressed.connect(action)
@@ -92,8 +101,10 @@ func build_ui() -> void:
 	var title: Label = label(header,"W O L F   M O O N",26)
 	header_title=title
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	mode_button = button(header,"CLASSIC",toggle_mode)
-	mode_button.custom_minimum_size.y=32
+	mode_button = button(header,"Classic",toggle_mode)
+	mode_button.icon=load("res://assets/ui/render.svg")
+	mode_button.custom_minimum_size=Vector2(132,46)
+	mode_button.add_theme_font_size_override("font_size",14)
 	body = HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation",28)
@@ -158,27 +169,30 @@ func build_ui() -> void:
 	button(mobile_pad,"Меню",func() -> void: game.key(-6))
 	button(mobile_pad,"Назад",func() -> void: game.key(-7))
 	button(mobile_pad,"Закрыть",func() -> void: keypad.hide())
-	label(column,"WOLF MOON  ·  Rovio 2006  ·  Персональная версия",12,Color("65796e"))
+	classic_footer=label(column,"WOLF MOON  ·  Rovio 2006",12,Color("65796e"))
 
 func layout_screen() -> void:
 	if display==null: return
 	if modern_ui!=null:
-		var ui_scale: float=clampf(minf(size.x/1440.0,size.y/810.0),0.85,3.0)
+		var ui_scale: float=1.0 if size.x<1000 or size.y<580 else clampf(minf(size.x/1440.0,size.y/810.0),1.0,3.0)
 		modern_ui.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 		modern_ui.scale=Vector2.ONE*ui_scale;modern_ui.size=size/ui_scale
+		modern_ui.layout()
 		modern_container.offset_bottom=-modern_ui.hud_reserve*ui_scale if modern_ui.hud.visible else 0
 	header_title.text="W O L F   M O O N" if size.x>=600 else "WOLF MOON"
 	header_title.add_theme_font_size_override("font_size",26 if size.x>=600 else 20)
 	for name: String in ["left","right"]: page_margin.add_theme_constant_override("margin_"+name,12 if size.x<400 else 24)
-	var available: Vector2 = Vector2(maxf(240,size.x-420),maxf(320,size.y-75))
+	var insets: Vector4=modern_ui.safe_insets*modern_ui.scale.x if modern_ui!=null else Vector4.ZERO
+	page_margin.add_theme_constant_override("margin_left",maxi(12,int(insets.x)+8))
+	page_margin.add_theme_constant_override("margin_right",maxi(12,int(insets.z)+8))
+	page_margin.add_theme_constant_override("margin_top",maxi(8,int(insets.y)+8))
+	page_margin.add_theme_constant_override("margin_bottom",maxi(8,int(insets.w)+8))
+	side.visible=size.x>=1000 and size.y>=650
+	touch_bar.visible=not side.visible
+	var available: Vector2 = Vector2(maxf(1,size.x-insets.x-insets.z-(380 if side.visible else 32)),maxf(1,size.y-insets.y-insets.w-(140 if touch_bar.visible else 86)))
 	var scale_factor: float = minf(available.x/240.0,available.y/320.0)
-	if not remastered: scale_factor = maxf(1,floorf(scale_factor))
+	if scale_factor>=1 and side.visible:scale_factor=floorf(scale_factor)
 	display.custom_minimum_size = Vector2(240,320)*scale_factor
-	side.visible = size.x>=800
-	touch_bar.visible = not side.visible
-	if size.x<800:
-		var factor: float = minf((size.x-48)/240,(size.y-200)/320)
-		display.custom_minimum_size = Vector2(240,320)*(factor if remastered else maxf(1,floorf(factor)))
 
 func build_modern() -> void:
 	presentation=WolfPresentationState.new(game.vm)
@@ -213,7 +227,9 @@ func show_keypad() -> void:
 
 func toggle_mode() -> void:
 	remastered = not remastered
-	mode_button.text = "ШИРОКИЙ CLASSIC" if remastered else "ОРИГИНАЛ"
+	mode_button.text = "Remastered" if remastered else "Classic"
+	mode_button.tooltip_text="Remastered / Classic · F2"
+	modern_ui.set_render_mode(remastered)
 	display.material = null
 	display.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	if transition!=null and transition.is_running():transition.kill()
@@ -247,6 +263,7 @@ func _process(delta: float) -> void:
 		modern_ui.update_state(state)
 		modern_container.offset_bottom=-modern_ui.hud_reserve*modern_ui.scale.y if modern_ui.hud.visible else 0
 		state.ui_scale=modern_ui.scale.y
+		state.ui_top_reserve=modern_ui.top_reserve
 		modern_world.synchronize(state,delta)
 		status.text=localized_status()
 		modern_ui.message.text=status.text

@@ -29,6 +29,7 @@ func run() -> void:
 	root.size=Vector2i(2860,1608)
 	main=load("res://main.tscn").instantiate();root.add_child(main);main.set_process(false)
 	assert(WolfSnapshot.new().load_game(main.game,"user://smoke.wms"));main.game.saves.persistent=false
+	main.game.vm.set_static("m","a","Lp;",main.game.vm.get_static("h","a","Li;"))
 	main.layout_screen();await create_timer(0.5).timeout
 	var vm: WolfVM=main.game.vm
 	vm.set_static("i","d","B",27);vm.set_static("i","e","B",36);vm.set_static("i","h","B",0);vm.set_static("i","m","I",0)
@@ -64,7 +65,7 @@ func run() -> void:
 	invoke("c","a(I)V",[1]);invoke("c","b(I)V",[0]);invoke("c","a(I)Ljava/lang/Object;",[0])
 	var menu: WMObject=invoke("j","a(I)Lj;",[0]);vm.set_static("m","a","Lp;",menu)
 	state=main.presentation.collect();main.modern_ui.update_state(state);await capture("regression_main_menu_ru")
-	assert(main.modern_ui.original_button.text=="Оригинал · F2")
+	assert(main.modern_ui.original_button.text=="Remastered" and main.modern_ui.original_button.tooltip_text.begins_with("Сейчас"))
 	vm.set_static("i","t","I",0);vm.get_static("i","d","[I").data.fill(-1);vm.get_static("i","e","[I").data.fill(-1)
 	invoke("i","a(I[Ljava/lang/String;I)V",[60,null,-1]);invoke("i","x()V")
 	# Inspect the screen queued by the original dispatcher without resuming
@@ -74,6 +75,6 @@ func run() -> void:
 	await capture("regression_dialogue_ru")
 	assert(state.tutorial and state.dialogue.contains("W") and not state.dialogue.contains("нажми 2"),JSON.stringify(state.dialogue))
 	invoke("c","a(I)V",[0]);invoke("c","b(I)V",[0]);invoke("c","a(I)Ljava/lang/Object;",[0])
-	state=main.presentation.collect();main.modern_ui.update_state(state);assert(main.modern_ui.original_button.text=="Original · F2")
+	state=main.presentation.collect();main.modern_ui.update_state(state);assert(main.modern_ui.original_button.text=="Remastered" and main.modern_ui.original_button.tooltip_text.begins_with("Current"))
 	print("UI REGRESSIONS OK: fullscreen map, large inventory, RU/EN buttons, modern tutorial")
 	main.game.close();main.game=null;quit()

@@ -40,7 +40,7 @@ func synchronize(state: Dictionary,_delta: float) -> void:
   for cmd: Dictionary in state.get("overlay_commands",[]):
    if cmd.get("phase","")=="map":full_map.append(cmd)
   var world_projection: Vector2=projection;var world_scale: float=pixel_scale
-  var ui_scale: float=float(state.get("ui_scale",1.0));var top: float=86*ui_scale;var available: float=maxf(1,size.y-top-18*ui_scale)
+  var ui_scale: float=float(state.get("ui_scale",1.0));var top: float=float(state.get("ui_top_reserve",78))*ui_scale;var available: float=maxf(1,size.y-top-18*ui_scale)
   pixel_scale=minf(size.x/240.0,available/320.0);projection=Vector2.ONE*pixel_scale;logical_height=320.0
   map_layer.position=Vector2((size.x-240*pixel_scale)/2,top+(available-320*pixel_scale)/2)
   map_layer.plan=prepare(full_map,false)
