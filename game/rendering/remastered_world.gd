@@ -38,7 +38,7 @@ func synchronize(state: Dictionary,_delta: float) -> void:
  pixel_scale=size.y/281.0;projection=Vector2(size.x/240.0,pixel_scale)
  if changed_size or last_revision!=int(state.render_revision):
   last_revision=int(state.render_revision);last_commands=state.render_commands
-  rebuild_background(state.render_commands,int(state.get("facing",0)))
+  rebuild_background(state.render_commands)
  if changed_size or last_overlay_revision!=int(state.get("overlay_revision",-1)):
   last_overlay_revision=int(state.get("overlay_revision",-1))
   overlay_layer.plan=prepare(state.get("overlay_commands",[]),true);overlay_layer.queue_redraw()
@@ -60,7 +60,7 @@ func synchronize(state: Dictionary,_delta: float) -> void:
  last_size=size
  render_signature="Wide Classic: %d base / %d overlay"%[base_layer.plan.size(),overlay_layer.plan.size()]
 
-func rebuild_background(commands: Array,facing: int) -> void:
+func rebuild_background(commands: Array) -> void:
  var prepared: Array[Dictionary]=prepare(commands,false)
  var before_clouds: Array[Dictionary]=[];var foreground: Array[Dictionary]=[];var clouds: Array[Dictionary]=[]
  var found_cloud: bool=false
@@ -70,7 +70,7 @@ func rebuild_background(commands: Array,facing: int) -> void:
   else:before_clouds.append(item)
  sky_layer.plan=before_clouds if found_cloud else []
  base_layer.plan=foreground if found_cloud else before_clouds
- cloud_layer.synchronize(clouds,pixel_scale,facing)
+ cloud_layer.synchronize(clouds,pixel_scale)
  sky_layer.queue_redraw();cloud_layer.queue_redraw();base_layer.queue_redraw()
 func texture_for(id: int) -> Texture2D:
  if not textures.has(id):
@@ -164,7 +164,7 @@ func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
     var dims: Vector2=Vector2(float(meta.rect[2]),float(meta.rect[3]))*pixel_scale
     if dims.x<=0 or dims.y<=0:continue
     if not overlay and phase=="sky" and id>=270 and id<=287:
-     plan.append({"kind":"cloud","texture":texture,"rect":Rect2(pos,dims),"clip":bounds,"depth":id%6,"anchor":cmd.x})
+     plan.append({"kind":"cloud","texture":texture,"rect":Rect2(pos,dims),"clip":bounds,"depth":id%6})
      continue
     var coverage: Rect2=Rect2(cmd.get("coverage",Rect2i()));var fill: Rect2=bounds
     if coverage.has_area():fill=Rect2(Vector2(coverage.position.x*projection.x,bounds.position.y),Vector2(coverage.size.x*projection.x,bounds.size.y)).intersection(bounds)
