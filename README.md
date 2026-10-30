@@ -6,6 +6,6 @@
 
 The browser build of the fan-made Wolf Moon (2006) remaster, created by PilotOfAsuka together with Codex AI. Play online without installing the game.
 
-**[Godot project / Исходный проект](https://github.com/PilotOfAsuka/wolf-moon-remastered/tree/godot)**
+**[Godot project / Исходный проект](https://github.com/PilotOfAsuka/wolfmoon-remastered/tree/godot)**
 
 Эта ветка публикуется GitHub Pages. This branch is published by GitHub Pages.
