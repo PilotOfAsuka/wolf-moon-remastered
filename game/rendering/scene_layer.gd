@@ -9,7 +9,11 @@ func _draw() -> void:
 	for item: Dictionary in plan:
 		match item.kind:
 			"texture":
-				if lighting!=null and item.has("foliage"):
+				if item.has("wind_quad"):
+					var mesh: Dictionary=item.wind_quad
+					draw_polygon(mesh.points,mesh.colors,mesh.uvs,item.texture)
+					if not mesh.fixed.is_empty():draw_texture_rect_region(item.texture,mesh.fixed.rect,mesh.fixed.source,Color.WHITE,false,false)
+				elif lighting!=null and item.has("foliage"):
 					var weights: Vector3=lighting.foliage
 					draw_texture_rect_region(item.foliage[0],item.rect,item.source,Color.WHITE,false,false)
 					if weights.y>0.001:draw_texture_rect_region(item.foliage[1],item.rect,item.source,Color(1,1,1,weights.y/maxf(0.001,weights.x+weights.y)),false,false)

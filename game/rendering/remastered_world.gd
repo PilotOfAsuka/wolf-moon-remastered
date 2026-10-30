@@ -13,11 +13,12 @@ var sky_layer: WolfSceneLayer
 var cloud_layer: WolfCloudLayer
 var rain_layer: WolfRainLayer
 var lighting: WolfLightPalette=WolfLightPalette.new()
+var vegetation_wind: WolfVegetationWind=WolfVegetationWind.new()
 var cloud_styles: Dictionary={}
 var overlay_layer: WolfSceneLayer
 var map_layer: WolfSceneLayer
 var logical_height: float=281.0
-const DRAW_SCHEMA: int=7
+const DRAW_SCHEMA: int=8
 var seen_schema: int=-1
 var pixel_scale: float=1.0
 var projection: Vector2=Vector2.ONE
@@ -32,6 +33,8 @@ func _ready() -> void:
  overlay_layer=WolfSceneLayer.new();add_child(overlay_layer)
  map_layer=WolfSceneLayer.new();add_child(map_layer)
  sky_layer.lighting=lighting;base_layer.lighting=lighting;overlay_layer.lighting=lighting;cloud_layer.lighting=lighting
+ base_layer.material=vegetation_wind.material
+ sky_layer.material=vegetation_wind.material
 func synchronize(state: Dictionary,delta: float) -> void:
  if not state.get("world_ready",false) or not state.has("render_commands") or size.y<=0:return
  if map_layer==null:map_layer=WolfSceneLayer.new();add_child(map_layer)
@@ -39,6 +42,7 @@ func synchronize(state: Dictionary,delta: float) -> void:
   grass_textures.clear();last_revision=-1;last_overlay_revision=-1;last_size=Vector2.ZERO;seen_schema=DRAW_SCHEMA
  var changed_size: bool=last_size!=size
  pixel_scale=size.y/281.0;projection=Vector2(size.x/240.0,pixel_scale)
+ vegetation_wind.synchronize(state,pixel_scale)
  if lighting.synchronize(state,delta):
   sky_layer.queue_redraw();base_layer.queue_redraw();overlay_layer.queue_redraw();cloud_layer.queue_redraw()
  if changed_size or last_revision!=int(state.render_revision):
@@ -61,6 +65,7 @@ func synchronize(state: Dictionary,delta: float) -> void:
  map_layer.visible=show_map;base_layer.visible=not show_map;overlay_layer.visible=not show_map
  sky_layer.visible=not show_map;cloud_layer.visible=not show_map
  cloud_layer.animating=state.get("screen","") in ["i","b"]
+ state.visual_wind_gust=vegetation_wind.gust
  rain_layer.configure(state,size,pixel_scale)
  last_size=size
  render_signature="Wide Classic: %d base / %d overlay"%[base_layer.plan.size(),overlay_layer.plan.size()]
@@ -85,10 +90,11 @@ func texture_for(id: int) -> Texture2D:
  return textures[id]
 func project(point: Vector2,group: Vector2=Vector2(-9999,-9999)) -> Vector2:
  return Vector2(group.x*projection.x+(point.x-group.x)*pixel_scale,point.y*pixel_scale) if group.x>-9000 else point*projection
-func add_texture(plan: Array[Dictionary],texture: Texture2D,pos: Vector2,dims: Vector2,clip: Rect2,sprite_id: int=-1) -> void:
+func add_texture(plan: Array[Dictionary],texture: Texture2D,pos: Vector2,dims: Vector2,clip: Rect2,sprite_id: int=-1,wind: Dictionary={}) -> void:
  var visible: Rect2=Rect2(pos,dims).intersection(clip)
  if not visible.has_area():return
  var item: Dictionary={"kind":"texture","texture":texture,"rect":visible,"source":Rect2((visible.position-pos)/pixel_scale,visible.size/pixel_scale)}
+ if not wind.is_empty():item.wind_quad=WolfVegetationWind.quad(visible,item.source,texture,wind)
  if sprite_id>=235 and sprite_id<=261:
   var family: int=(sprite_id-235)%9
   item.foliage=[texture_for(235+family),texture_for(244+family),texture_for(253+family)]
@@ -122,6 +128,15 @@ func grass_texture(id: int) -> Texture2D:
  return grass_textures[id]
 func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
  var plan: Array[Dictionary]=[];var tiled: Dictionary={}
+ var tree_tops: Dictionary={}
+ if not overlay:
+  for part: Dictionary in commands:
+   if part.kind!="sprite" or part.get("phase","")!="base":continue
+   var id: int=int(part.id)
+   if id<105 or id>142 or int(part.group_type)<0:continue
+   var key: String=str(part.group)+":"+str(part.group_type)
+   var top: float=float(part.y)-float(sprites[str(id)].origin[1])
+   tree_tops[key]=minf(float(tree_tops.get(key,top)),top)
  var grass_plan: Array[Dictionary]=[]
  if not overlay:
   for band: Dictionary in commands:
@@ -194,7 +209,27 @@ func prepare(commands: Array,overlay: bool) -> Array[Dictionary]:
      var step: float=dims.x*0.75;var x: float=pos.x
      while x>fill.position.x:x-=step
      while x<fill.end.x:add_texture(plan,texture,Vector2(x,pos.y),dims,bounds);x+=step
-    else:add_texture(plan,texture,pos,dims,bounds,id)
+    else:
+     var wind: Dictionary={}
+     if not overlay and phase=="base" and id>=105 and id<=206:
+      var grass: bool=id>=147
+      # Fallen needles and the opaque ground cover remain still.
+      if grass or id<=142:
+       var root: float=pos.y+dims.y
+       var height: float=dims.y
+       var anchor: Vector2=Vector2(cmd.x,cmd.y)
+       var seed: int=id
+       if grass:
+        root=pos.y+(float(meta.origin[1]) if float(meta.origin[1])>0 else float(meta.rect[3]))*pixel_scale
+        height=maxf(pixel_scale,root-pos.y)
+       elif int(cmd.group_type)>=0:
+        var key: String=str(cmd.group)+":"+str(cmd.group_type)
+        root=group.y*pixel_scale
+        height=maxf(pixel_scale,(group.y-float(tree_tops.get(key,group.y-20)))*pixel_scale)
+        anchor=group;seed=int(cmd.group_type)
+       var amplitude: float=clampf(height/pixel_scale*(0.055 if grass else 0.016),0.1,1.1 if grass else 1.8)
+       wind={"grass":grass,"root":root,"height":height,"amplitude":amplitude,"phase":WolfVegetationWind.phase_for(anchor,seed)}
+     add_texture(plan,texture,pos,dims,bounds,id,wind)
    "rect":
     var rect: Rect2=Rect2(cmd.rect).intersection(clip)
     if rect.has_area():plan.append({"kind":"rect","rect":Rect2(project(rect.position,group),rect.size*(Vector2.ONE*pixel_scale if interaction else projection)),"color":cmd.color})

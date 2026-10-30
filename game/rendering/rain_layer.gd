@@ -17,7 +17,7 @@ func configure(state: Dictionary,dimensions: Vector2,scale_factor: float) -> voi
 	visible=exposed and not state.get("full_map",false)
 	animating=state.get("screen","") in ["i","b"]
 	target_strength=float(state.get("rain_strength",0.0)) if exposed else 0.0
-	target_wind=float(state.get("rain_wind",0.0))*0.22
+	target_wind=float(state.get("rain_wind",0.0))*0.22*lerpf(0.9,1.15,float(state.get("visual_wind_gust",0.4)))
 	var hour: int=int(state.get("hour",12));night=hour>=19 or hour<=4
 	if not exposed and strength>0.0:
 		strength=0.0
